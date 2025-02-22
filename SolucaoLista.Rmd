@@ -1,8 +1,8 @@
 ---
 title: "Solução Lista 01"
 author: |
-        | Nome: Fulano de Tal
-        | E-mail: fdt@aluno.ufabc.edu.br
+        | Nome: Guilherme Afonso Gigeck
+        | E-mail: guilherme.gigeck@aluno.ufabc.edu.br
         | Nome: Fulano de Tal
         | E-mail: fdt@aluno.ufabc.edu.br
         | (Não é preciso informar os RAs)
@@ -19,6 +19,8 @@ knitr::opts_chunk$set(echo = T,
                       warning=FALSE,
                       message=FALSE)
 options(width =70)
+library(tibble)
+library(tidyverse)
 ```
 
 ## Exercício 01
@@ -28,6 +30,81 @@ options(width =70)
 
 
 ## Exercício 03
-
+```{r}
+myKNN=function(k,x,D){
+  D2 <- D %>%
+        mutate(dist=(x[1]-x_1)^2+(x[2]-x_2)^2) %>%
+        arrange(dist) %>% head(k) %>% count(y) %>% arrange(desc(n))
+  return(D2)
+}
+```
+```{r}
+#basic unit test
+Dinstance = tibble(x_1=rnorm(100,1,1),
+                   x_2=rnorm(100,-1,2),
+                   y=factor(sample(c("one","two","three"),100,replace=T))
+                   )
+x = c(1.05,0.5)
+ans = myKNN(6,x,Dinstance)
+ans
+```
 
 ## Exercício 04
+```{r}
+data("iris")
+iris = as_tibble(iris) %>%
+       select(Petal.Length,Sepal.Length,Species) %>%
+       rename(x_1=Petal.Length,x_2=Sepal.Length,y=Species)
+
+irislist = as.list(iris)
+
+Kcheck = function(mylist,mytibble,k){
+                  return(pmap_lgl(mylist,function(x_1,x_2,y){
+                          ans=myKNN(k,c(x_1,x_2),mytibble)
+                          return(as.character(ans$y[1])==y)
+                          }
+                  ))
+                }
+#k=1
+IrisK1Check = Kcheck(irislist,iris,1)
+K1accuracy = sum(IrisK1Check)
+Irisk10Check = Kcheck(irislist,iris,10)
+K10accuracy = sum(Irisk10Check)
+result=t(list(total=length(iris$y),K1accuracy=K1accuracy, K10accuracy=K10accuracy))
+result
+```
+A razão do único erro é, devido às características filtradas, que existem duas entradas de características idênticas e diferentes tipos e assim por conta do empate o KNN escolheu pseudo-aleatóriamente errado (provavelmente por conta da disposição inicial da lista e o algoritmo de ordenamento)
+
+## Exercício 05
+Seja $D_{m} = ((x_{1},y_{1}), ... (x_{n},y_{n}))$ conjunto de dados amostrados, nos quais $x_k \in\mathcal{X}$ e $y_{k}\in\mathbb{R}$, e $X e Y$ variáveis aleatórias tais que $D_{m}$ seja um exemplo de amostragem. Considere a função de predição $\textit{f}\colon\mathcal{X}\rightarrow\mathbb{R}$ e a função perda $\textit{l}_{2}\colon\mathbb{R}\times\mathbb{R}\rightarrow[0,\infty]; \textit{l}(y,y')=|y-y'|$. Calcula-se então o risco esperado $\mathcal{R}(\textit{f})$ em relação as variáveis X e Y:
+\begin{align}
+\mathcal{R}(\textit{f}) 
+&= \mathbb{E}_{XY}[\textit{l}(Y,\textit{f}(X))] \\
+&= \mathbb{E}_{X}[\mathbb{E}_{Y|X}[\textit{l}(Y,\textit{f}(X))]]
+\end{align}
+Para minimizar o risco esperado basta minimizar $\mathbb{E}_{Y|X}[\textit{l}(Y,\textit{f}(X))]$ para todo espaço condicionado por X, logo busca-se o ponto crítico dessa expressão:
+\begin{align}
+\dfrac{\mathrm{d}\mathbb{E}_{Y}[\textit{l}(Y,\textit{f}(X)) | X=x]}{\mathrm{d}\textit{f}}
+&= \mathbb{E}_{Y}[\dfrac{\mathrm{d}\textit{l}(Y,\textit{f}(X))}{\mathrm{d}\textit{f}}| X=x] \text{ utilizando o resultado fornecido}\\
+&= \int_{\mathbb{R}}\dfrac{\mathrm{d}\textit{l}(y,\textit{f}(X))}{\mathrm{d}\textit{f}}\mathrm{d}y|X \\
+&= \int_{\mathbb{R}}\dfrac{\mathrm{d}|y-f(x)|}{\mathrm{d}\textit{f}}\mathrm{d}y|X \text{   como estamos condicionando a x}\\
+&= (\int_{-\infty}^{\textit{f}(x)}\dfrac{\mathrm{d}|y-f(x)|}{\mathrm{d}\textit{f}}\mathrm{d}y|X) + (\int_{\textit{f}(x)}^{\infty}\dfrac{\mathrm{d}|y-f(x)|}{\mathrm{d}\textit{f}}\mathrm{d}y|X)) \\
+&= (\int_{-\infty}^{\textit{f}(x)}-1y|X) + (\int_{\textit{f}(x)}^{\infty}1y|X)) \text{  probabilidade acumulativa} \\
+&= -\mathbb{P}(y < \textit{f}(x) | X=x) + \mathbb{P}(y > \textit{f}(x) | X=x)
+\end{align}
+Portanto para que $\dfrac{\mathrm{d}\mathbb{E}_{Y}[\textit{l}(Y,\textit{f}(X)) | X=x]}{\mathrm{d}\textit{f}}=0$ temos que:
+\begin{align}
+\mathbb{P}(y < \textit{f}(x) | X=x) = \mathbb{P}(y > \textit{f}(x) | X=x)
+\end{align}
+Ou seja, a função $\textit{f}$ que minimiza o risco é dada por $\textit{f}(x)\colon=Mediana(Y | X=x)$ $\square$.
+
+## Exercício 06
+Dada a descrição do exercício temos que a probabilidade de um subconjunto da hiperesfera é diretamente proporcional ao seu volume. O volume de uma hiperesfera de dimensão d de raio r é dado por $V_{d}(r)=C*r^{d}$ onde $C\in\mathbb{R}$ é constante conhecida cujo valor não é de interesse para esta análise. Calculando a mediana $M\leq1$ do evento descrito:
+\begin{align}
+\frac{1}{2} = \mathbb{P}(min\{X_{1},\cdots,X_{m}\} > M)
+&= \mathbb{P}(\bigcap_{i=1}^{m}(X_{i} > M)) \\
+&= \prod_{i=0}^{m}\mathbb{P}(X_{i} > M) \text{ por independencia dos eventos} \\
+&= \mathbb{P}(X > M)^{m} \text{ por semelhança dos eventos} \\
+&= (1-V_{d}(M)/V_{d}(1))^m = (1-M^d)^m
+\end{align}
+Isolando M obtemos $M = (1-0.5^\frac{1}{m})^\frac{1}{d}$ como desejado
