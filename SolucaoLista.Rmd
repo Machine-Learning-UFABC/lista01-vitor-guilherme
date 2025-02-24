@@ -3,8 +3,8 @@ title: "Solução Lista 01"
 author: |
         | Nome: Guilherme Afonso Gigeck
         | E-mail: guilherme.gigeck@aluno.ufabc.edu.br
-        | Nome: Fulano de Tal
-        | E-mail: fdt@aluno.ufabc.edu.br
+        | Nome: Vitor Moraes Bravo Alves
+        | E-mail: vitor.bravo@aluno.ufabc.edu.br
         | (Não é preciso informar os RAs)
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
@@ -24,10 +24,17 @@ library(tidyverse)
 ```
 
 ## Exercício 01
+a) Problema de classificação: É um tipo de problema de aprendizado supervisionado, onde o objetivo é prever a classe, categoria ou rótulo dos dados com base no vetor de característica.
+Um exemplo para esse problema é um sistema de detecção te spam em e-mails, em que o objetivo é reconhecer se um e-mail é spam ou não. O vetor de características pode ter elementos como a inclusão de palavras-chave específicas, frequência de links no corpo do e-mail, remetente, a estrutura do e-mail e análise linguística. Com isso é possível classificar um e-mail como "spam" ou "não spam".
 
+b) Problema de regressão: É um problema de aprendizado supervisionado, onde o objetivo é prever um valor numérico contínuo com base no vetor de características, nesse problema não existem rótulos.
+Um exemplo é um modelo de regressão para prever o preço de um imóvel. Nesse caso o vetor de características pode conter elementos como a localização, o tamanho do imóvel em metros quadrados, número de quartos, salas e banheiros, idade do imóvel e proximidade do sistema de transporte público. Assim podemos estimar um valor de venda do imóvel.
+
+c) Problema de agrupamento: É um tipo de problema de aprendizado não-supervisionado em que o objetivo é distribuir o conjunto de dados em grupos com características semelhantes, mas sem classificações ou rótulos definidos.
+Um exemplo pode ser um modelo para segmentar clientes em uma agência de marketing. O vetor de características pode conter elementos como a idade do cliente, localização, histórico de compras, frequência de compras, valor gasto. Dessa forma é possível direcionar as propagandas de um determinado produto à um público específico.
 
 ## Exercício 02
-
+A maldição da dimensionalidade é um fenômeno que ocorre quando trabalhamos com dados com muitas dimensões. Quanto maior for o número de variáveis ou características da base de dados, mais distantes estarão os vizinhos mais próximos do ponto desejado, ou seja, os dados estarão cada vez mais distantes uns dos outros. Isso dificulta muito na identificação de padrões e classificações, comprometendo a eficácia de métodos que usam a proximidade dos pontos, como o método kNN, e afeta o desempenho dos algoritmos. 
 
 ## Exercício 03
 ```{r}
